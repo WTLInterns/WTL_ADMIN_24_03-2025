@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+'use client';
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   FaBusinessTime,
@@ -10,6 +12,7 @@ import {
   FaEdit,
   FaTimes,
   FaCarAlt,
+  FaBars,
 } from "react-icons/fa";
 import {
   BsArrowRightCircle,
@@ -17,18 +20,63 @@ import {
   BsArrowDownCircle,
 } from "react-icons/bs";
 import { FaPeopleGroup, FaChartPie } from "react-icons/fa6";
+import { useRouter } from "next/navigation";
 
-const Layout = ({ children }) => {
+const Layout = ({ children=null }) => {
   const [openDropdown, setOpenDropdown] = useState(null); // Track which dropdown is open
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track if the user is logged in
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Track if the sidebar is open on mobile
+  const router = useRouter();
+
+  // Check if the user is logged in on component mount
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+
+    if (!user) {
+      router.push("/login"); // Redirect to login if user is not found
+    } else {
+      setIsLoggedIn(true); // Set logged-in state to true
+    }
+  }, [router]);
 
   const toggleDropdown = (dropdownKey) => {
     setOpenDropdown(openDropdown === dropdownKey ? null : dropdownKey);
   };
 
+  const handleLogout = () => {
+    console.log("Logging out..."); // Debugging
+    localStorage.removeItem("user");
+    router.push("/login");
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  // If the user is not logged in, don't render the layout
+  if (!isLoggedIn) {
+    return null; // Or you can return a loading spinner
+  }
+
+  // Render the layout only if the user is logged in
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 z-10">
+      {/* Hamburger Menu Icon for Mobile */}
+      <div className="md:hidden fixed top-4 left-4 z-50">
+        <button
+          onClick={toggleSidebar}
+          className="text-blue-600 focus:outline-none"
+        >
+          <FaBars className="w-6 h-6" />
+        </button>
+      </div>
+
       {/* Sidebar */}
-      <div className="w-64 bg-blue-600 text-white p-5 overflow-hidden">
+      <div
+        className={`w-64 bg-blue-600 h-screen text-white p-5 overflow-hidden fixed md:relative transform ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 transition-transform duration-200 ease-in-out z-40`}
+      >
         <img className="mx-auto" src="/images/wtlLogo.jpeg" alt="WTL Logo" />
         <ul>
           <li>
@@ -130,7 +178,7 @@ const Layout = ({ children }) => {
             )}
           </li>
 
-          {/* {Fleet Section} */}
+          {/* Fleet Section */}
           <button
             onClick={() => toggleDropdown("Fleet")}
             className="flex items-center justify-between w-full py-2 px-4 hover:bg-blue-500 rounded"
@@ -173,52 +221,6 @@ const Layout = ({ children }) => {
               </li>
             </ul>
           )}
-
-          {/* B2B Dropdown */}
-          {/* <li className="relative">
-            <button
-              onClick={() => toggleDropdown("b2b")}
-              className="flex items-center justify-between w-full py-2 px-4 hover:bg-blue-500 rounded"
-            >
-              B2B
-              <FaChevronDown
-                className={`ml-2 transform ${
-                  openDropdown === "b2b" ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-            {openDropdown === "b2b" && (
-              <ul className="mt-2 bg-white text-gray-700 rounded shadow-md w-full">
-                <li>
-                  <Link
-                    href="/b2b/all"
-                    className="flex items-center py-2 px-4 hover:bg-blue-100 rounded"
-                  >
-                    <FaBusinessTime className="mr-2" />
-                    All B2B
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/b2b/all/request"
-                    className="flex items-center py-2 px-4 hover:bg-blue-100 rounded"
-                  >
-                    <FaCheck className="mr-2" />
-                    Request B2B
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/b2b/all/report"
-                    className="flex items-center py-2 px-4 hover:bg-blue-100 rounded"
-                  >
-                    <FaUsers className="mr-2" />
-                    B2B Report
-                  </Link>
-                </li>
-              </ul>
-            )}
-          </li> */}
 
           {/* Other Links */}
           <li>
@@ -291,11 +293,31 @@ const Layout = ({ children }) => {
               Reset Password
             </Link>
           </li>
+
+          <li>
+            <Link
+              href="/penalty"
+              className="block py-2 px-4 hover:bg-blue-500 rounded"
+            >
+              View Penalty
+            </Link>
+          </li>
+
+          {isLoggedIn && (
+            <li>
+              <button
+                onClick={handleLogout}
+                className="block py-2 px-4 hover:bg-blue-500 rounded w-full text-left"
+              >
+                Logout
+              </button>
+            </li>
+          )}
         </ul>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">{children}</div>
+      <div className="flex-1 p-6 mt-16 md:mt-0 z-100">{children}</div>
     </div>
   );
 };

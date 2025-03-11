@@ -9,18 +9,18 @@ const HomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('isLoggedIn') === 'true';
+    const user = localStorage.getItem('user');
 
-    if (!isAuthenticated) {
+    if (!user) {
       router.push('/login'); 
     } else {
       setIsLoggedIn(true);
     }
   }, [router]);
 
-  if (!isLoggedIn) {
-    return null; 
-  }
+  // if (!isLoggedIn) {
+  //   return null; 
+  // }
 
   return (
     <>

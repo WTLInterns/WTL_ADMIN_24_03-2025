@@ -12,7 +12,7 @@
     "@emailjs/browser": "^4.4.1",
     "@react-google-maps/api": "^2.20.6",
     "adminwtl": "file:",
-    "axios": "^1.7.9",
+    "axios": "^1.8.2",
     "bootstrap": "^5.3.3",
     "datatables.net": "^2.1.8",
     "datatables.net-bs4": "^2.1.8",
