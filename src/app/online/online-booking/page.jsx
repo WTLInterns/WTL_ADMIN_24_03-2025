@@ -110,8 +110,8 @@ export default function Bookings() {
               onChange={(e) => handleBookingValue(e.target.value)}
             >
               <option value="All Bookings">All Bookings</option>
-              <option value="oneway">One Way</option>
-              <option value="Round Trip">Round Trip</option>
+              <option value="oneWay">One Way</option>
+              <option value="roundTrip">Round Trip</option>
             </select>
           </div>
 
@@ -194,6 +194,8 @@ export default function Bookings() {
                           ? "Ongoing"
                           : booking.status === 2
                           ? "Completed"
+                          :booking.status===5
+                          ?"Reassign"
                           : booking.status === 3
                           ? "Cancelled"
                           : "Unknown"}

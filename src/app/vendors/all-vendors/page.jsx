@@ -9,6 +9,8 @@ const AllVendors = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+
   const [newVendor, setNewVendor] = useState({
     vendorCompanyName: "",
     contactNo: "",
@@ -72,7 +74,7 @@ const AllVendors = () => {
       });
 
       if (response.ok) {
-        alert("Vendor added successfully");
+        // alert("Vendor added successfully");
         setShowForm(false);
         const updatedVendor = await response.json();
         setVendors((prev) => [...prev, updatedVendor]);
@@ -95,6 +97,11 @@ const AllVendors = () => {
           panPhoto: null,
           vendorOtherDetails: "",
         });
+        setShowSuccessPopup(true);
+      setTimeout(() => {
+        setShowSuccessPopup(false);
+      }, 1000);
+
       } else {
         alert("Error adding vendor");
       }
@@ -154,6 +161,14 @@ const AllVendors = () => {
             <FaPlus /> Add Vendor
           </button>
         </div>
+
+        {showSuccessPopup && (
+              <div className="fixed top-0 left-0 right-0 z-50">
+                <div className="bg-green-500 text-white p-4 text-center animate-slide-down">
+                  Cab saved successfully!
+                </div>
+              </div>
+            )}
 
         {showForm && (
           <form

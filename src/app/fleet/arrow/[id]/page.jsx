@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-
 import { FaCar } from "react-icons/fa";
 import Navbar from "../../../../container/components/Navbar";
 import { useParams } from "next/navigation";
@@ -10,28 +9,26 @@ const ArrowPage = () => {
   const [showModal, setShowModal] = useState(false); // State for modal visibility
   const [modalTitle, setModalTitle] = useState(""); // Store the button text dynamically
   const [rcNumber, setRcNumber] = useState(""); // Example RC Number
-  const [cab, setCab] = useState([]);
+  const [cab, setCab] = useState({}); // Initialize cab as an object
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // State for success modal visibility
+  const [successMessage, setSuccessMessage] = useState(""); // State for success message
 
   const params = useParams();
   console.log(params.id);
-
-  // const cabs = cab?.find((p) => p.cab === parseInt(params.id));
 
   // Function to open modal with a dynamic title
   const openModal = (title) => {
     setModalTitle(title);
     setShowModal(true);
   };
-  // console.log(id);
+
   useEffect(() => {
     // Fetching data from the backend
     fetch(`http://localhost:8080/cabAdmin/${params.id}`) // Make sure this URL matches your backend API
       .then((response) => response.json())
       .then((data) => setCab(data))
       .catch((error) => console.error("Error fetching vehicles:", error));
-  }, []);
-
-  const [status, setStatus] = useState();
+  }, [params.id]);
 
   const [message, setMessage] = useState(""); // For displaying messages like success or error
 
@@ -57,6 +54,9 @@ const ArrowPage = () => {
       .then((response) => {
         // On success, update the message state with the new status
         setMessage(`Status updated successfully to ${response.data.status}`);
+        setSuccessMessage(`Status updated successfully to ${response.data.status}`);
+        setShowSuccessModal(true); // Show the success popup
+        setCab((prevCab) => ({ ...prevCab, status: response.data.status })); // Update the cab status
       })
       .catch((error) => {
         // Handle error (e.g., if the CabAdmin with the given ID is not found)
@@ -68,9 +68,8 @@ const ArrowPage = () => {
       });
   };
 
-  console.log(status);
-
   console.log(cab);
+
   return (
     <Navbar>
       <div className="container mx-auto p-4">
@@ -200,13 +199,23 @@ const ArrowPage = () => {
           <div className="absolute top-4 right-4 flex space-x-4">
             <button
               onClick={() => updateStatus("COMPLETED")}
-              className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
+              className={`bg-green-500 text-white py-2 px-4 rounded-lg ${
+                cab.status === "COMPLETED"
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-green-600"
+              }`}
+              disabled={cab.status === "COMPLETED"} // Disable if status is already COMPLETED
             >
               Approve
             </button>
             <button
               onClick={() => updateStatus("PENDING")}
-              className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600"
+              className={`bg-red-500 text-white py-2 px-4 rounded-lg ${
+                cab.status === "PENDING"
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-red-600"
+              }`}
+              disabled={cab.status === "PENDING"} // Disable if status is already PENDING
             >
               Reject
             </button>
@@ -220,49 +229,37 @@ const ArrowPage = () => {
               <h2 className="text-xl font-semibold mb-4 text-black">
                 {modalTitle}
               </h2>
-              {/* <input
-                type="text"
-                value={rcNumber}
-                readOnly
-                className="w-full p-2 border border-gray-300 rounded-lg mb-4"
-              /> */}
 
-              {modalTitle == "Car RC Number" ? (
+              {modalTitle === "Car RC Number" && (
                 <img
                   src={`http://localhost:8080/images/cabAdminImg/${cab.cabImage}`} // Prepend the static URL
                   alt={modalTitle}
                   className="w-full h-full object-cover mb-5"
                 />
-              ) : (
-                " "
               )}
 
-              {modalTitle == "Insurance" ? (
+              {modalTitle === "Insurance" && (
                 <img
                   src={`http://localhost:8080/images/cabAdminImg/${cab.insurance}`} // Prepend the static URL
                   alt={modalTitle}
                   className="w-full h-full object-cover mb-5"
                 />
-              ) : (
-                " "
               )}
-              {modalTitle == "Permit" ? (
+
+              {modalTitle === "Permit" && (
                 <img
                   src={`http://localhost:8080/images/cabAdminImg/${cab.permit}`} // Prepend the static URL
                   alt={modalTitle}
                   className="w-full h-full object-cover mb-5"
                 />
-              ) : (
-                " "
               )}
-              {modalTitle == "Fitness Certificate" ? (
+
+              {modalTitle === "Fitness Certificate" && (
                 <img
                   src={`http://localhost:8080/images/cabAdminImg/${cab.fitnessCert}`} // Prepend the static URL
                   alt={modalTitle}
                   className="w-full h-full object-cover mb-5"
                 />
-              ) : (
-                " "
               )}
 
               <button
@@ -274,7 +271,41 @@ const ArrowPage = () => {
             </div>
           </div>
         )}
+
+        {/* Success Modal with Slide-In Animation */}
+        {showSuccessModal && (
+          <div className="fixed inset-0 flex items-start justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-[350px] mt-20 slide-in">
+              <h2 className="text-xl font-semibold mb-4 text-black">Success</h2>
+              <p className="text-gray-700 mb-4">{successMessage}</p>
+              <button
+                className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 w-full"
+                onClick={() => setShowSuccessModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Add CSS for Slide-In Animation */}
+      <style jsx>{`
+        @keyframes slideIn {
+          from {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        .slide-in {
+          animation: slideIn 0.5s ease-out;
+        }
+      `}</style>
     </Navbar>
   );
 };

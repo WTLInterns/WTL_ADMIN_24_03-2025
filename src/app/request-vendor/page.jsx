@@ -26,7 +26,7 @@ export default function RequestVendorForm() {
       setVendorName(vendorData.vendorCompanyName); // Update state
       const vendorId = vendorData.id; // ✅ Ensure correct property name
       const staticPassword = "Vendor@123"; // Static password for all vendors
-      const loginLink = "http://localhost:3000/login"; // Login page URL
+      const loginLink = "http://localhost:3001/Login"; // Login page URL
 
       // Prepare Email Template Parameters
       const templateParams = {

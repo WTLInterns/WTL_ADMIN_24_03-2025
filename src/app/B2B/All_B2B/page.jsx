@@ -22,6 +22,8 @@ export default function AllB2B() {
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [b2bList, setB2BList] = useState([]);
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  
 
   // Form data with additional fields for actual File objects
   const [formData, setFormData] = useState({
@@ -133,6 +135,10 @@ export default function AllB2B() {
       }
       const savedRecord = await response.json();
       console.log("B2B record saved:", savedRecord);
+      setShowSuccessPopup(true);
+      setTimeout(() => {
+        setShowSuccessPopup(false);
+      }, 1000);
 
       // Refresh the list
       await fetchB2BList();
@@ -266,6 +272,14 @@ export default function AllB2B() {
           </table>
         </div>
       </div>
+
+      {showSuccessPopup && (
+              <div className="fixed top-0 left-0 right-0 z-50">
+                <div className="bg-green-500 text-white p-4 text-center animate-slide-down">
+                  Cab saved successfully!
+                </div>
+              </div>
+            )}
 
       {/* Modal for Adding B2B */}
       {showModal && (

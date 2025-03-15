@@ -11,6 +11,8 @@ const ArrowPage = () => {
   const [cab, setCab] = useState({});
   const params = useParams();
   const [message, setMessage] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // State for success modal
+  const [successMessage, setSuccessMessage] = useState(""); // State for success message
 
   // Function to open modal with a dynamic title
   const openModal = (title) => {
@@ -48,6 +50,9 @@ const ArrowPage = () => {
       )
       .then((response) => {
         setMessage(`Status updated successfully to ${response.data.status}`);
+        setSuccessMessage(`Status updated successfully to ${response.data.status}`);
+        setShowSuccessModal(true); // Show success popup
+        setCab((prevCab) => ({ ...prevCab, status: response.data.status })); // Update cab status
       })
       .catch((error) => {
         if (error.response && error.response.status === 404) {
@@ -133,13 +138,23 @@ const ArrowPage = () => {
           <div className="absolute top-4 right-4 flex space-x-4">
             <button
               onClick={() => updateStatus("COMPLETED")}
-              className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
+              className={`bg-green-500 text-white py-2 px-4 rounded-lg ${
+                cab.status === "COMPLETED"
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-green-600"
+              }`}
+              disabled={cab.status === "COMPLETED"} // Disable if status is already COMPLETED
             >
               Approve
             </button>
             <button
               onClick={() => updateStatus("PENDING")}
-              className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600"
+              className={`bg-red-500 text-white py-2 px-4 rounded-lg ${
+                cab.status === "PENDING"
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-red-600"
+              }`}
+              disabled={cab.status === "PENDING"} // Disable if status is already PENDING
             >
               Reject
             </button>
@@ -176,7 +191,41 @@ const ArrowPage = () => {
             </div>
           </div>
         )}
+
+        {/* Success Modal with Slide-In Animation */}
+        {showSuccessModal && (
+          <div className="fixed inset-0 flex items-start justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-[350px] mt-20 slide-in">
+              <h2 className="text-xl font-semibold mb-4 text-black">Success</h2>
+              <p className="text-gray-700 mb-4">{successMessage}</p>
+              <button
+                className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 w-full"
+                onClick={() => setShowSuccessModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Add CSS for Slide-In Animation */}
+      <style jsx>{`
+        @keyframes slideIn {
+          from {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        .slide-in {
+          animation: slideIn 0.5s ease-out;
+        }
+      `}</style>
     </Navbar>
   );
 };

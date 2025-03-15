@@ -60,7 +60,7 @@ const Layout = ({ children=null }) => {
 
   // Render the layout only if the user is logged in
   return (
-    <div className="flex h-screen bg-gray-100 z-10">
+    <div className="flex h-auto bg-gray-100 z-10">
       {/* Hamburger Menu Icon for Mobile */}
       <div className="md:hidden fixed top-4 left-4 z-50">
         <button
@@ -73,8 +73,8 @@ const Layout = ({ children=null }) => {
 
       {/* Sidebar */}
       <div
-        className={`w-64 bg-blue-600 h-screen text-white p-5 overflow-hidden fixed md:relative transform ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`w-64 bg-blue-600 h-auto text-white p-5 overflow-hidden fixed md:relative transform ${
+          isSidebarOpen ? "translate-x-0 " : "-translate-x-full"
         } md:translate-x-0 transition-transform duration-200 ease-in-out z-40`}
       >
         <img className="mx-auto" src="/images/wtlLogo.jpeg" alt="WTL Logo" />
@@ -317,7 +317,7 @@ const Layout = ({ children=null }) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6 mt-16 md:mt-0 z-100">{children}</div>
+      <div className="flex-1 p-6 mt-16 md:mt-0 z-100 text-black">{children}</div>
     </div>
   );
 };
