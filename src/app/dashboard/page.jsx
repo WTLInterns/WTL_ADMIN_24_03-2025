@@ -86,7 +86,7 @@ const Dashboard = () => {
         <Home />
       </div>
 
-      <div className="flex-1 p-10">
+      <div className="flex-1 relative top-11">
         <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
 
         {error && <div className="text-red-500 mb-4">{error}</div>}
@@ -95,7 +95,7 @@ const Dashboard = () => {
         ) : (
           <>
             {/* Dashboard Cards */}
-            <div className="p-8 space-y-8">
+            <div className="space-y-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="flex items-center justify-between bg-white p-6 rounded-lg shadow-md">
                   <FaBusinessTime className="text-blue-500 text-4xl" />

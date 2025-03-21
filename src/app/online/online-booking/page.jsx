@@ -99,8 +99,8 @@ export default function Bookings() {
 
   return (
     <div className="flex">
-      <Navbar />
-      <main className="p-6">
+      <Navbar  style={{height:0}} />
+      <main className="">
         <div className="mt-6">
           {/* Sorting Dropdown */}
           <div className="mb-4">
@@ -160,7 +160,11 @@ export default function Bookings() {
                       {booking.toLocation}
                     </td>
                     <td className="border border-gray-300 p-2">
-                      {booking.tripType}
+                    {booking.tripType
+    ? booking.tripType
+        .replace(/[- ]/g, "") // Remove hyphens and spaces
+        .replace(/^./, (match) => match.toUpperCase()) // Capitalize the first letter
+    : ""}
                     </td>
                     <td className="border border-gray-300 p-2">
                       {booking.startDate}

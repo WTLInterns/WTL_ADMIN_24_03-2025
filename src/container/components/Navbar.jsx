@@ -60,7 +60,7 @@ const Layout = ({ children=null }) => {
 
   // Render the layout only if the user is logged in
   return (
-    <div className="flex h-auto bg-gray-100 z-10">
+    <div className="flex h-auto bg-gray-100 z-10" style={{height:"100vh"}}>
       {/* Hamburger Menu Icon for Mobile */}
       <div className="md:hidden fixed top-4 left-4 z-50">
         <button
@@ -75,7 +75,7 @@ const Layout = ({ children=null }) => {
       <div
         className={`w-64 bg-blue-600 h-auto text-white p-5 overflow-hidden fixed md:relative transform ${
           isSidebarOpen ? "translate-x-0 " : "-translate-x-full"
-        } md:translate-x-0 transition-transform duration-200 ease-in-out z-40`}
+        } md:translate-x-0 transition-transform duration-200 ease-in-out z-40 h-[100%]`} 
       >
         <img className="mx-auto" src="/images/wtlLogo.jpeg" alt="WTL Logo" />
         <ul>

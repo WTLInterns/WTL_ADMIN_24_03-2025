@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../../../container/components/Navbar";
+import { useRouter } from "next/navigation";
 
 const PasswordResetPage = () => {
   const [email, setEmail] = useState("");
@@ -12,7 +13,10 @@ const PasswordResetPage = () => {
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resendDisabled, setResendDisabled] = useState(false);
+  const [timer, setTimer] = useState(60);
 
+const router = useRouter()
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user && user.email) {
@@ -21,6 +25,19 @@ const PasswordResetPage = () => {
       setMessage("No user data found in localStorage.");
     }
   }, []);
+
+  useEffect(() => {
+    let interval;
+    if (resendDisabled && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    } else if (timer === 0) {
+      setResendDisabled(false);
+      setTimer(60);
+    }
+    return () => clearInterval(interval);
+  }, [resendDisabled, timer]);
 
   const handleSendOTP = async () => {
     setLoading(true);
@@ -32,6 +49,7 @@ const PasswordResetPage = () => {
       );
       setMessage(response.data);
       setOtpSent(true);
+      setResendDisabled(true);
     } catch (error) {
       setMessage("Error occurred. Please try again.");
     } finally {
@@ -47,8 +65,12 @@ const PasswordResetPage = () => {
         null,
         { params: { email, otp } }
       );
-      setMessage(response.data);
-      setOtpVerified(true);
+      if (response.data === true) {
+        setMessage("OTP verified successfully.");
+        setOtpVerified(true);
+      } else {
+        setMessage("Invalid OTP. Please try again.");
+      }
     } catch (error) {
       setMessage("Invalid OTP. Please try again.");
     } finally {
@@ -70,6 +92,7 @@ const PasswordResetPage = () => {
         { params: { email, newPassword } }
       );
       setMessage(response.data);
+      router.push("/"); // Correct usage of router.push
     } catch (error) {
       setMessage("Error occurred while resetting password. Please try again.");
     } finally {
@@ -109,9 +132,13 @@ const PasswordResetPage = () => {
                 <button
                   onClick={handleSendOTP}
                   className="w-full p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                  disabled={loading}
+                  disabled={loading || resendDisabled}
                 >
-                  {loading ? "Sending..." : "Send OTP"}
+                  {loading
+                    ? "Sending..."
+                    : resendDisabled
+                    ? `Resend OTP in ${timer}s`
+                    : "Send OTP"}
                 </button>
               </div>
             )}

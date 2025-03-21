@@ -340,7 +340,11 @@ const Bookings = () => {
                       {row.startDate} {row.time}
                     </td>
                     <td className="px-2 py-2 text-gray-700 text-xs">
-                      {row.tripType}
+                    {row.tripType
+    ? row.tripType
+        .replace(/[- ]/g, "") // Remove hyphens and spaces
+        .replace(/^./, (match) => match.toUpperCase()) // Capitalize the first letter
+    : ""}
                     </td>
                     <td className="px-2 py-2 text-gray-700 text-xs">
                       {row.car}

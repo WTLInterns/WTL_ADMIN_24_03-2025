@@ -9,11 +9,12 @@ const Page = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [vendors, setVendors] = useState([]);
-  const [penalties, setPenalties] = useState([]);
+  const [penalties, setPenalties] = useState([]); // Penalties by ID or companyName
   const [showModal, setShowModal] = useState(false);
-  const [allPenalties, setAllPenalties] = useState([]);
-  const [filteredPenalties, setFilteredPenalties] = useState([]);
+  const [allPenalties, setAllPenalties] = useState([]); // All penalties
+  const [filteredPenalties, setFilteredPenalties] = useState([]); // Penalties filtered by date
 
+  // Fetch all vendors on component mount
   useEffect(() => {
     const getAllVendors = async () => {
       try {
@@ -26,40 +27,61 @@ const Page = () => {
     getAllVendors();
   }, []);
 
+  // Fetch penalties by ID or company name when selectedVendor changes
+  useEffect(() => {
+    const fetchPenalties = async () => {
+      if (selectedVendor) {
+        try {
+          let url = "";
+          if (filter === "id") {
+            url = `http://localhost:8080/getPenalty/${selectedVendor}`; // Fetch by ID
+          } else if (filter === "companyName") {
+            url = `http://localhost:8080/getByName/${selectedVendor}`; // Fetch by company name
+          }
+
+          const response = await axios.get(url);
+          setPenalties(response.data);
+        } catch (error) {
+          console.error("Error fetching penalties:", error);
+        }
+      } else {
+        setPenalties([]);
+      }
+    };
+
+    fetchPenalties();
+  }, [selectedVendor, filter]);
+
+  // Apply date range filter to penalties or allPenalties
   useEffect(() => {
     if (startDate && endDate) {
-      const filtered = allPenalties.filter((penalty) => {
+      const dataToFilter = showModal ? allPenalties : penalties; // Use allPenalties if modal is open, otherwise use penalties
+      const filtered = dataToFilter.filter((penalty) => {
         const penaltyDate = new Date(penalty.date);
         return penaltyDate >= new Date(startDate) && penaltyDate <= new Date(endDate);
       });
       setFilteredPenalties(filtered);
+    } else {
+      setFilteredPenalties([]); // Reset filteredPenalties if no date range is selected
     }
-  }, [startDate, endDate, allPenalties]);
+  }, [startDate, endDate, penalties, allPenalties, showModal]);
 
+  // Handle filter change (companyName or id)
   const handleFilterChange = (e) => {
     setFilter(e.target.value);
     setSelectedVendor("");
     setStartDate("");
     setEndDate("");
     setPenalties([]);
+    setFilteredPenalties([]);
   };
 
-  const handleVendorChange = async (e) => {
+  // Handle vendor selection
+  const handleVendorChange = (e) => {
     setSelectedVendor(e.target.value);
-    if (e.target.value) {
-      try {
-        const response = await axios.get(
-          `http://localhost:8080/get${filter === "id" ? "Penalty" : "ByName"}/${e.target.value}`
-        );
-        setPenalties(response.data);
-      } catch (error) {
-        console.error("Error fetching penalties:", error);
-      }
-    } else {
-      setPenalties([]);
-    }
   };
 
+  // Fetch all penalties for the modal
   const fetchAllPenalties = async () => {
     try {
       const response = await axios.get("http://localhost:8080/getAllPenalties");
@@ -70,6 +92,18 @@ const Page = () => {
     }
   };
 
+  // Determine which data to display
+  const dataToDisplay = showModal
+    ? filteredPenalties.length > 0
+      ? filteredPenalties
+      : allPenalties
+    : filteredPenalties.length > 0
+    ? filteredPenalties
+    : penalties;
+
+  // Calculate total amount
+  const totalAmount = dataToDisplay.reduce((sum, penalty) => sum + penalty.amount, 0);
+
   return (
     <div className="flex">
       <div>
@@ -79,6 +113,7 @@ const Page = () => {
       <div className="flex-1 p-10 text-black">
         <h1 className="text-2xl font-bold mb-6">Penalty</h1>
 
+        {/* Filter and Vendor Selection */}
         <div className="flex items-center gap-4 mb-6">
           <div className="flex-1">
             <label htmlFor="filter" className="block text-sm font-medium text-gray-700">
@@ -117,51 +152,58 @@ const Page = () => {
           </div>
         </div>
 
+        {/* Show All Penalties Button and Date Range Inputs */}
         <div className="mt-6 flex gap-4">
           <button onClick={fetchAllPenalties} className="bg-blue-500 text-white px-4 py-2 rounded-md">
             Show All Penalties
           </button>
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
-            className="p-2 border border-gray-300 rounded-md" />
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
-            className="p-2 border border-gray-300 rounded-md" />
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="p-2 border border-gray-300 rounded-md"
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="p-2 border border-gray-300 rounded-md"
+          />
         </div>
 
-        {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center relative top-[13px]">
-            <div className="bg-white p-6 rounded-lg w-3/4">
-              <h2 className="text-lg font-bold mb-4">All Penalties</h2>
-              <table className="w-full border-collapse border border-gray-300">
-                <thead>
-                  <tr className="bg-gray-200">
-                    <th className="border border-gray-300 px-4 py-2">Penalty ID</th>
-                    <th className="border border-gray-300 px-4 py-2">Booking ID</th>
-                    <th className="border border-gray-300 px-4 py-2">Amount</th>
-                    <th className="border border-gray-300 px-4 py-2">Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(filteredPenalties.length > 0 ? filteredPenalties : allPenalties).map((penalty) => (
-                    <tr key={penalty.id}>
-                      <td>{penalty.pId}</td>
-                      <td>{penalty.booking.bookingId}</td>
-                      <td>₹{penalty.amount}</td>
-                      <td>{penalty.date}</td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr className="bg-gray-200 font-bold">
-                    <td colSpan="2">Total Amount</td>
-                    <td>₹{(filteredPenalties.length > 0 ? filteredPenalties : allPenalties).reduce((sum, p) => sum + p.amount, 0)}</td>
-                    <td></td>
-                  </tr>
-                </tfoot>
-              </table>
-              <button onClick={() => setShowModal(false)} className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md">Close</button>
-            </div>
-          </div>
-        )}
+        {/* Display Penalties */}
+        <div className="mt-6">
+          <h2 className="text-xl font-bold mb-4">Penalties</h2>
+          <table className="w-full border-collapse border border-gray-300">
+            <thead>
+              <tr className="bg-gray-200">
+                <th className="border border-gray-300 px-4 py-2">Penalty ID</th>
+                <th className="border border-gray-300 px-4 py-2">Booking ID</th>
+                <th className="border border-gray-300 px-4 py-2">Amount</th>
+                <th className="border border-gray-300 px-4 py-2">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dataToDisplay.map((penalty) => (
+                <tr key={penalty.id}>
+                  <td className="border border-gray-300 px-4 py-2">{penalty.pId}</td>
+                  <td className="border border-gray-300 px-4 py-2">{penalty.booking.bookingId}</td>
+                  <td className="border border-gray-300 px-4 py-2">₹{penalty.amount}</td>
+                  <td className="border border-gray-300 px-4 py-2">{penalty.date}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="bg-gray-200 font-bold">
+                <td colSpan="2" className="border border-gray-300 px-4 py-2">
+                  Total Amount
+                </td>
+                <td className="border border-gray-300 px-4 py-2">₹{totalAmount}</td>
+                <td className="border border-gray-300 px-4 py-2"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
       </div>
     </div>
   );
