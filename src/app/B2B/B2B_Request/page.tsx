@@ -78,7 +78,7 @@ const RequestB2B = () => {
   return (
     <div className="flex">
       <Navbar />
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto p-6 h-screen">
         <h1 className="text-3xl font-bold text-gray-700 mb-6">Request B2B Registration</h1>
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
           <div className="mb-4">

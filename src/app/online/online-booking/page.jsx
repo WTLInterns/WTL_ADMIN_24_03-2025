@@ -100,7 +100,8 @@ export default function Bookings() {
   return (
     <div className="flex">
       <Navbar />
-      <main className="p-6">
+      <main className="flex-1 p-6 overflow-y-auto h-screen">
+
         <div className="mt-6">
           {/* Sorting Dropdown */}
           <div className="mb-4">
