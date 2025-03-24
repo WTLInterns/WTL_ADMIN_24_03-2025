@@ -84,6 +84,7 @@ const Dashboard = () => {
     <div className="flex">
       <div>
         <Home />
+        <main className="flex-1 p-6 overflow-y-auto h-screen"></main>
       </div>
 
       <div className="flex-1 relative top-11">

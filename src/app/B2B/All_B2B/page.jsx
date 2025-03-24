@@ -201,7 +201,9 @@ export default function AllB2B() {
 
   return (
     <Navbar>
-      <div className="p-6 bg-white shadow-lg rounded-lg">
+      <div className="p-6 bg-white shadow-lg rounded-lg h-screen overflow-y-auto">
+      {/* <main className="flex-1 p-6 overflow-y-auto h-screen"></main> */}
+
         <h2 className="text-2xl font-bold mb-6 text-gray-800">B2B List</h2>
 
         {/* Search & Add B2B */}

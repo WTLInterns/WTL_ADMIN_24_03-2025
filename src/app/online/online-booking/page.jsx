@@ -99,8 +99,10 @@ export default function Bookings() {
 
   return (
     <div className="flex">
-      <Navbar  style={{height:0}} />
-      <main className="">
+
+      {/* <Navbar  style={{height:0}} /> */}
+      <Navbar />
+      <main className="flex-1 p-6 overflow-y-auto h-screen">
         <div className="mt-6">
           {/* Sorting Dropdown */}
           <div className="mb-4">

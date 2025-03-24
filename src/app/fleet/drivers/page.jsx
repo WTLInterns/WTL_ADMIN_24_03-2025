@@ -118,7 +118,7 @@ const page = () => {
   return (
     <>
       <Navbar>
-        <div className="text-black">
+        <div className="text-black h-screen">
           <div className="p-6">
             {/* Header Section */}
             <div className="bg-gray-100 p-4 flex items-center justify-between rounded-lg shadow">
