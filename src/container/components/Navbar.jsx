@@ -282,6 +282,15 @@ const Layout = ({ children=null }) => {
                     Vendor Report
                   </Link>
                 </li>
+                <li>
+                  <Link 
+                  href="/vendor-registration"
+                  classname="flex items-center py-2 px-4 hover:bg-gray-600 rounded"
+                  >
+                    <FaCheck className="mr-2" />
+                    Vendor Registration 
+                    </Link>
+                  </li>
               </ul>
             )}
           </li>
