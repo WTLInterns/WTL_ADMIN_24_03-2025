@@ -30,7 +30,7 @@ const Page = () => {
   // Fetch booking details once when bookingId is available
   useEffect(() => {
     if (bookingId) {
-      fetch(`http://localhost:8080/booking/${bookingId}`)
+      fetch(`https://api.worldtriplink.com/booking/${bookingId}`)
         .then((res) => {
           if (!res.ok) throw new Error("Error fetching booking details");
           return res.json();
@@ -53,7 +53,7 @@ const Page = () => {
     const fetchVendors = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8080/vendors/allVendors"
+          "https://api.worldtriplink.com/vendors/allVendors"
         );
 
         // Check if the response is OK (status 200)
@@ -77,7 +77,7 @@ const Page = () => {
     try {
       // Make the PUT request to assign the vendor
       const response = await axios.put(
-        `http://localhost:8080/${bookingId}/assignVendor/${vendorId}`
+        `https://api.worldtriplink.com/${bookingId}/assignVendor/${vendorId}`
       );
 
       // Handle the successful response (booking updated)
@@ -96,7 +96,7 @@ const Page = () => {
     try {
       // Make the PUT request to assign the vendor
       const response = await axios.put(
-        `http://localhost:8080/${bookingId}/assignCabAdmin/${cabAdminId}`
+        `https://api.worldtriplink.com/${bookingId}/assignCabAdmin/${cabAdminId}`
       );
 
       // Handle the successful response (booking updated)
@@ -115,7 +115,7 @@ const Page = () => {
     try {
       // Make the PUT request to assign the vendor
       const response = await axios.put(
-        `http://localhost:8080/${bookingId}/assignDriveAdmin/${driverAdminId}`
+        `https://api.worldtriplink.com/${bookingId}/assignDriveAdmin/${driverAdminId}`
       );
 
       // Handle the successful response (booking updated)
@@ -135,7 +135,7 @@ const Page = () => {
   const handleUpdateStatus = async (newStatus) => {
     try {
       const response = await axios.put(
-        `http://localhost:8080/${bookingId}/status`,
+        `https://api.worldtriplink.com/${bookingId}/status`,
         { status: newStatus } // Send the new status in the request body
       );
       setBooking(response.data); // Update the booking status in state
@@ -148,7 +148,7 @@ const Page = () => {
 
   const handleComplete = () => {
     if (window.confirm("Are you sure you want to mark the trip complete?")) {
-      fetch(`http://localhost:8080/complete-trip/${bookingId}`, {
+      fetch(`https://api.worldtriplink.com/complete-trip/${bookingId}`, {
         method: "POST",
       })
         .then((res) => {
@@ -165,7 +165,7 @@ const Page = () => {
 
   const getCabAdmin = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/cabAdmin/all");
+      const response = await axios.get("https://api.worldtriplink.com/cabAdmin/all");
       setCabAdmin(response.data);
     } catch (error) {
       console.error("Error fetching cab admin data:", error);
@@ -180,7 +180,7 @@ console.log(cabAdmin)
 
 const getDriverAdmin = async () => {
   try {
-    const response = await axios.get("http://localhost:8080/driverAdmin/all");
+    const response = await axios.get("https://api.worldtriplink.com/driverAdmin/all");
     setDriverAdmin(response.data);
   } catch (error) {
     console.error("Error fetching cab admin data:", error);
@@ -193,7 +193,7 @@ useEffect(()=>{
 
   const handleCancel = () => {
     if (window.confirm("Are you sure you want to cancel the trip?")) {
-      fetch(`http://localhost:8080/cancel-trip/${bookingId}`, {
+      fetch(`https://api.worldtriplink.com/cancel-trip/${bookingId}`, {
         method: "POST",
       })
         .then((res) => {
@@ -319,7 +319,7 @@ useEffect(()=>{
                         {booking.vendor && booking.vendor.id === row.id ? (
                           <div className="flex flex-col items-center">
                             <button
-                              className="border rounded-full p-2 flex items-center justify-center bg-gray-300 cursor-not-allowed"
+                              className="border rounded-full p-2 flex items-center justify-center bg-red-700 cursor-not-allowed"
                               disabled
                               title={
                                 booking.status === 5

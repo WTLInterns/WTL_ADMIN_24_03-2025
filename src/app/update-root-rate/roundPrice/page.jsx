@@ -1,18 +1,11 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Navbar from "../../../container/components/Navbar";
+import axios from "axios";
 
 const UpdateTripPricing = ({ params }) => {
-  const [states, setStates] = useState([]);
-  const [cities, setCities] = useState([]);
-  const [dStates, setDStates] = useState([]);
-  const [dCities, setDCities] = useState([]);
-
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedCity, setSelectedCity] = useState("");
-  const [selectedDState, setSelectedDState] = useState("");
-  const [selectedDCity, setSelectedDCity] = useState("");
-
+  const [pickup, setPickup] = useState("");
+  const [drop, setDrop] = useState("");
   const [prices, setPrices] = useState({
     hatchback: "",
     sedan: "",
@@ -20,11 +13,15 @@ const UpdateTripPricing = ({ params }) => {
     suv: "",
     suvPlus: "",
   });
-
   const [distance, setDistance] = useState("");
   const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
-  const [isRoundTrip, setIsRoundTrip] = useState(false); // New state for trip type
+  const [isRoundTrip, setIsRoundTrip] = useState(true); // set to round trip mode
 
+  // Refs for the autocomplete input fields
+  const pickupRef = useRef(null);
+  const dropRef = useRef(null);
+
+  // Load Google Maps API with Places library
   useEffect(() => {
     const loadGoogleMapsAPI = () => {
       const script = document.createElement("script");
@@ -39,77 +36,54 @@ const UpdateTripPricing = ({ params }) => {
     };
 
     loadGoogleMapsAPI();
-
-    fetch("http://localhost:8080/api/states")
-      .then((res) => res.json())
-      .then((data) => {
-        setStates(data);
-        setDStates(data);
-      })
-      .catch((error) => console.error("Error fetching states:", error));
   }, []);
 
+  // Initialize Autocomplete for Pickup and Drop inputs once API is loaded
   useEffect(() => {
-    if (selectedCity && selectedDCity && googleMapsLoaded) {
-      console.log(
-        "Both cities are selected. Proceeding to calculate distance."
+    if (googleMapsLoaded && window.google) {
+      const pickupAutocomplete = new window.google.maps.places.Autocomplete(
+        pickupRef.current,
+        { types: ["geocode"] }
       );
+      pickupAutocomplete.addListener("place_changed", () => {
+        const place = pickupAutocomplete.getPlace();
+        setPickup(place.formatted_address || place.name);
+      });
+
+      const dropAutocomplete = new window.google.maps.places.Autocomplete(
+        dropRef.current,
+        { types: ["geocode"] }
+      );
+      dropAutocomplete.addListener("place_changed", () => {
+        const place = dropAutocomplete.getPlace();
+        setDrop(place.formatted_address || place.name);
+      });
+    }
+  }, [googleMapsLoaded]);
+
+  // Calculate distance when both pickup and drop are selected
+  useEffect(() => {
+    if (pickup && drop && googleMapsLoaded) {
+      console.log("Both pickup and drop locations selected. Calculating distance.");
       calculateDistance();
     } else {
-      if (!selectedCity || !selectedDCity) {
-        console.log("Either source city or destination city is not selected.");
-      }
-      if (!googleMapsLoaded) {
-        console.log("Google Maps API not loaded yet.");
-      }
+      if (!pickup || !drop) console.log("Either pickup or drop location is not selected.");
+      if (!googleMapsLoaded) console.log("Google Maps API not loaded yet.");
     }
-  }, [selectedCity, selectedDCity, googleMapsLoaded]);
-
-  const handleStateChange = async (stateId) => {
-    setSelectedState(stateId);
-    try {
-      const response = await fetch(`http://localhost:8080/cities/${stateId}`);
-      const data = await response.json();
-      setCities(data);
-    } catch (error) {
-      console.error("Error fetching cities:", error);
-    }
-  };
-
-  const handleDStateChange = async (stateId) => {
-    setSelectedDState(stateId);
-    try {
-      const response = await fetch(`http://localhost:8080/cities/${stateId}`);
-      const data = await response.json();
-      setDCities(data);
-    } catch (error) {
-      console.error("Error fetching destination cities:", error);
-    }
-  };
+  }, [pickup, drop, googleMapsLoaded]);
 
   const calculateDistance = () => {
-    console.log("Selected City IDs:", selectedCity, selectedDCity);
-    const origin = cities.find(
-      (city) => city.id.toString() === selectedCity
-    )?.name;
-    const destination = dCities.find(
-      (city) => city.id.toString() === selectedDCity
-    )?.name;
-
-    console.log(`Origin: ${origin}, Destination: ${destination}`);
-
-    if (origin && destination && googleMapsLoaded) {
-      const service = new google.maps.DistanceMatrixService();
+    if (pickup && drop && googleMapsLoaded) {
+      const service = new window.google.maps.DistanceMatrixService();
       service.getDistanceMatrix(
         {
-          origins: [origin],
-          destinations: [destination],
-          travelMode: google.maps.TravelMode.DRIVING,
+          origins: [pickup],
+          destinations: [drop],
+          travelMode: window.google.maps.TravelMode.DRIVING,
         },
         (response, status) => {
           if (status === "OK") {
-            const calculatedDistance =
-              response.rows[0].elements[0].distance.text;
+            const calculatedDistance = response.rows[0].elements[0].distance.text;
             setDistance(calculatedDistance);
             console.log(`Calculated Distance: ${calculatedDistance}`);
           } else {
@@ -119,72 +93,144 @@ const UpdateTripPricing = ({ params }) => {
         }
       );
     } else {
-      console.log(
-        "Cannot calculate distance. Either origin or destination is missing."
-      );
+      console.log("Cannot calculate distance. Either pickup or drop is missing.");
     }
   };
 
+  // When form is submitted, first call GET to extract trip data based on pickup and drop.
+  // Then if no data exists, call POST ("/rounprice") else call PUT ("/update-roundway-prices").
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const sourceStateName =
-      states.find((state) => state.id.toString() === selectedState)?.name || "";
-    const sourceCityName =
-      cities.find((city) => city.id.toString() === selectedCity)?.name || "";
-    const destinationStateName =
-      dStates.find((state) => state.id.toString() === selectedDState)?.name ||
-      "";
-    const destinationCityName =
-      dCities.find((city) => city.id.toString() === selectedDCity)?.name || "";
-
-    if (!selectedState || !selectedDState || !selectedDCity || !selectedCity) {
-      alert("Please select both source and destination states and cities.");
+    if (!pickup || !drop) {
+      alert("Please select both pickup and drop locations.");
       return;
     }
 
-    const queryString = new URLSearchParams({
-      sourceState: sourceStateName,
-      sourceCity: sourceCityName,
-      destinationState: destinationStateName,
-      destinationCity: destinationCityName,
-      hatchbackPrice: prices.hatchback,
-      sedanPrice: prices.sedan,
-      sedanPremiumPrice: prices.sedanPremium,
-      suvPrice: prices.suv,
-      suvPlusPrice: prices.suvPlus,
-      isRoundTrip: isRoundTrip.toString(), // Include round-trip option
-    }).toString();
-
-    const url = `http://localhost:8080/update-roundway-prices?${queryString}`;
+    // Extract source/destination city and state from pickup and drop strings
+    // Expecting "City, State" format; adjust splitting logic if needed.
+    const pickupParts = pickup.split(",").map((part) => part.trim());
+    const dropParts = drop.split(",").map((part) => part.trim());
+    const sourceCity = pickupParts[0] || "";
+    const sourceState = pickupParts[1] || "";
+    const destinationCity = dropParts[0] || "";
+    const destinationState = dropParts[1] || "";
 
     try {
-      const response = await fetch(url, {
-        method: "PUT",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update trip pricing");
+      // Call the GET API for round-trip to check for existing data.
+      const getUrl = `https://api.worldtriplink.com/roundTrip/${encodeURIComponent(pickup)}/${encodeURIComponent(drop)}`;
+      const getResponse = await fetch(getUrl);
+      let existingTrips = [];
+      if (getResponse.ok) {
+        existingTrips = await getResponse.json();
+      } else {
+        console.error("GET request error:", getResponse.status);
       }
 
-      const result = await response.json();
-      alert("Trip pricing updated successfully!");
-    } catch (error) {
-      console.error("Error submitting data:", error);
+      let apiUrl;
+      let method;
+
+      if (!existingTrips || existingTrips.length === 0) {
+        // No record found; use POST API for creating a new round trip pricing record.
+        apiUrl = "https://api.worldtriplink.com/rounprice";
+        method = "POST";
+      } else {
+        // Record exists; call the PUT API to update pricing.
+        apiUrl = "https://api.worldtriplink.com/update-roundway-prices";
+        method = "PUT";
+      }
+
+      // Build query parameters. For POST we include default status "s".
+      const queryParams = new URLSearchParams({
+        sourceState: sourceState,
+        destinationState: destinationState,
+        sourceCity: sourceCity,
+        destinationCity: destinationCity,
+        hatchbackPrice: prices.hatchback,
+        sedanPrice: prices.sedan,
+        sedanPremiumPrice: prices.sedanPremium,
+        suvPrice: prices.suv,
+        suvPlusPrice: prices.suvPlus,
+        ...(method === "POST" ? { status: "s" } : {}),
+      }).toString();
+
+      const apiUrlWithParams = `${apiUrl}?${queryParams}`;
+
+      const apiResponse = await fetch(apiUrlWithParams, { method });
+      if (!apiResponse.ok) {
+        throw new Error("API call failed");
+      }
+
+      const result = await apiResponse.json();
+      alert(method === "POST" ? "Trip pricing created successfully!" : "Trip pricing updated successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Error occurred while processing round-trip pricing");
     }
   };
 
+  // Calculate total cost based on distance and price provided
   const calculateTotal = (price) => {
     if (!distance || isNaN(price)) return null;
-
-    // Remove non-numeric characters from the distance string (like "km")
     const numericDistance = parseFloat(distance.replace(/[^\d.-]/g, ""));
-
-    // If the trip is round-trip, double the distance
-    const totalDistance = numericDistance * 2;
-
-    // Return the total cost based on the car price and total distance
+    // For round trip, double the distance
+    const totalDistance = isRoundTrip ? numericDistance * 2 : numericDistance;
     return totalDistance * price;
+  };
+
+
+  // for excel file 
+
+  const [jobs, setJobs] = useState([]);
+  const [file, setFile] = useState(null);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  // Fetch jobs on mount
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  const fetchJobs = async () => {
+    try {
+      const res = await axios.get("https://api.worldtriplink.com/upload/roundTrip/excel/jobs");
+      setJobs(res.data);
+    } catch (err) {
+      console.error("Error fetching jobs:", err);
+    }
+  };
+
+  const deleteJob = async () => {
+    try {
+      const res = await axios.delete("https://api.worldtriplink.com/upload/roundTrip/excel/delete");
+      alert(res.data);
+      fetchJobs();
+    } catch (err) {
+      console.error("Error deleting job:", err);
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    e.preventDefault();
+
+    if (!file || !startDate || !endDate) {
+      alert("Please select file, start date, and end date.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("startDate", startDate);
+    formData.append("endDate", endDate);
+
+    try {
+      const res = await axios.post("https://api.worldtriplink.com/upload/roundTrip/excel", formData);
+      alert(res.data);
+      fetchJobs();
+    } catch (err) {
+      console.error("Error uploading file:", err);
+      alert("Upload failed.");
+    }
   };
 
   return (
@@ -192,8 +238,9 @@ const UpdateTripPricing = ({ params }) => {
       <Navbar />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-center mb-8">
-          {/* {isRoundTrip ? "Round Trip Prices" : "One Way Trip Prices"} Outstation */}
-          Round Way Trip Prices Outstation
+          {isRoundTrip
+            ? "Round Way Trip Prices Outstation"
+            : "One Way Trip Prices Outstation"}
         </h1>
         <div className="card bg-white shadow-md rounded-md mb-6">
           <div className="card-header bg-gray-200 px-4 py-2 rounded-t-md">
@@ -232,125 +279,60 @@ const UpdateTripPricing = ({ params }) => {
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium">Source State</label>
-              <select
-                value={selectedState}
-                onChange={(e) => handleStateChange(e.target.value)}
-                className="block w-full p-2 border border-gray-300 rounded"
-              >
-                <option value="">Select State</option>
-                {states.map((state) => (
-                  <option key={state.id} value={state.id}>
-                    {state.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Source City</label>
-              <select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-                className="block w-full p-2 border border-gray-300 rounded"
-              >
-                <option value="">Select City</option>
-                {cities.map((city) => (
-                  <option key={city.id} value={city.id}>
-                    {city.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
               <label className="block text-sm font-medium">
-                Destination State
+                Pickup Location
               </label>
-              <select
-                value={selectedDState}
-                onChange={(e) => handleDStateChange(e.target.value)}
+              <input
+                type="text"
+                ref={pickupRef}
+                placeholder="Enter Pickup Location (e.g., City, State)"
                 className="block w-full p-2 border border-gray-300 rounded"
-              >
-                <option value="">Select State</option>
-                {dStates.map((state) => (
-                  <option key={state.id} value={state.id}>
-                    {state.name}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
             <div>
               <label className="block text-sm font-medium">
-                Destination City
+                Drop Location
               </label>
-              <select
-                value={selectedDCity}
-                onChange={(e) => setSelectedDCity(e.target.value)}
+              <input
+                type="text"
+                ref={dropRef}
+                placeholder="Enter Drop Location (e.g., City, State)"
                 className="block w-full p-2 border border-gray-300 rounded"
-              >
-                <option value="">Select City</option>
-                {dCities.map((city) => (
-                  <option key={city.id} value={city.id}>
-                    {city.name}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
           </div>
 
           <div className="pt-2">
-            <div>
-              {distance ? (
-                <div>
-                  {
-                    cities.find((city) => city.id.toString() === selectedCity)
-                      ?.name
-                  }{" "}
-                  -{" "}
-                  {
-                    dCities.find((city) => city.id.toString() === selectedDCity)
-                      ?.name
-                  }{" "}
-                  : {distance}
-                </div>
-              ) : null}
-            </div>
+            {distance && <div>Distance: {distance}</div>}
           </div>
 
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-4">Prices</h2>
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {["hatchback", "sedan", "sedanPremium", "suv", "suvPlus"].map(
-                (carType) => (
-                  <div key={carType}>
-                    <label className="block text-sm font-medium capitalize">
-                      {carType.replace(/([A-Z])/g, " $1")}
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={prices[carType]}
-                      onChange={(e) =>
-                        setPrices({ ...prices, [carType]: e.target.value })
-                      }
-                      className="block w-full p-2 border border-gray-300 rounded"
-                    />
-                    {prices[carType] && (
-                      <div className="mt-2 text-sm text-gray-600">
-                        {`${
-                          carType.charAt(0).toUpperCase() + carType.slice(1)
-                        } Cab`}
-                      </div>
-                    )}
-                    {prices[carType] && distance && (
-                      <div className="mt-2 text-sm text-gray-600">
-                        Total: {calculateTotal(prices[carType])} INR (Price *
-                        Distance)
-                      </div>
-                    )}
-                  </div>
-                )
-              )}
+              {["hatchback", "sedan", "sedanPremium", "suv", "suvPlus"].map((carType) => (
+                <div key={carType}>
+                  <label className="block text-sm font-medium capitalize">
+                    {carType.replace(/([A-Z])/g, " $1")}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={prices[carType]}
+                    onChange={(e) => setPrices({ ...prices, [carType]: e.target.value })}
+                    className="block w-full p-2 border border-gray-300 rounded"
+                  />
+                  {prices[carType] && (
+                    <div className="mt-2 text-sm text-gray-600">
+                      {`${carType.charAt(0).toUpperCase() + carType.slice(1)} Cab`}
+                    </div>
+                  )}
+                  {prices[carType] && distance && (
+                    <div className="mt-2 text-sm text-gray-600">
+                      Total: {calculateTotal(prices[carType])} INR (Price * Distance)
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -364,6 +346,62 @@ const UpdateTripPricing = ({ params }) => {
           </div>
         </form>
       </div>
+
+      <div className="p-6 max-w-xl mx-auto">
+      <h2 className="text-2xl font-bold mb-4">Excel Job Manager</h2>
+
+      <form onSubmit={handleFileUpload} className="mb-6 space-y-4">
+        <input
+          type="file"
+          accept=".xlsx"
+          onChange={(e) => setFile(e.target.files[0])}
+          className="block"
+        />
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="block border rounded p-2"
+        />
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          className="block border rounded p-2"
+        />
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Upload Excel & Schedule
+        </button>
+      </form>
+
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold">Scheduled Jobs</h3>
+        {jobs.length === 0 ? (
+          <p>No jobs scheduled</p>
+        ) : (
+          <ul className="list-disc pl-5">
+            {jobs.map((job, i) => (
+              <li key={i} className="mb-1">
+                <strong>{job.jobName}</strong> – Next Fire: {job.nextFireTime}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {jobs.length > 0 && (
+        <button
+          className="bg-red-600 text-white px-4 py-2 rounded"
+          onClick={deleteJob}
+        >
+          Delete Job & Excel
+        </button>
+      )}
+    </div>
+
     </div>
   );
 };

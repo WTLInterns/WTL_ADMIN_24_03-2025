@@ -17,7 +17,7 @@ export default function RequestVendorForm() {
 
     try {
       // Fetch Vendor Details by Email
-      const vendorResponse = await fetch(`http://localhost:8080/vendors/email/${email}`);
+      const vendorResponse = await fetch(`https://api.worldtriplink.com/vendors/email/${email}`);
       if (!vendorResponse.ok) {
         throw new Error("Failed to fetch vendor details");
       }
@@ -26,7 +26,7 @@ export default function RequestVendorForm() {
       setVendorName(vendorData.vendorCompanyName); // Update state
       const vendorId = vendorData.id; // ✅ Ensure correct property name
       const staticPassword = "Vendor@123"; // Static password for all vendors
-      const loginLink = "http://localhost:3001/Login"; // Login page URL
+      const loginLink = "https://vendor.worldtriplink.com/Login"; // Login page URL
 
       // Prepare Email Template Parameters
       const templateParams = {

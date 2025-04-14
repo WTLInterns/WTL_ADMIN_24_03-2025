@@ -45,8 +45,9 @@ export default function Page() {
   const [vendor, setVendor] = useState(initialVendorState);
   const [hasMounted, setHasMounted] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const [formDisabled, setFormDisabled] = useState(false);
 
-  // Ensure client-side rendering to avoid hydration issues.
   useEffect(() => {
     setHasMounted(true);
   }, []);
@@ -67,7 +68,6 @@ export default function Page() {
     }));
   };
 
-  // Blur input when pressing Enter (hides mobile keyboard)
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -86,7 +86,7 @@ export default function Page() {
     });
 
     try {
-      const res = await fetch("http://192.168.231.233:8080/vendors/add", {
+      const res = await fetch("https://api.worldtriplink.com/vendors/add", {
         method: "POST",
         body: formData,
       });
@@ -94,7 +94,8 @@ export default function Page() {
       if (res.ok) {
         setVendor(initialVendorState);
         setErrorMsg("");
-        alert("Registration submitted successfully! Please check your email.");
+        setSuccessMsg("Registration submitted successfully! Please check your email.");
+        setFormDisabled(true);
       } else {
         const errorText = await res.text();
         setErrorMsg(
@@ -120,93 +121,104 @@ export default function Page() {
           </h2>
         </div>
         <div className="p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {Object.keys(vendor).map((key) => (
-                <div key={key} className="flex flex-col">
-                  <label
-                    htmlFor={key}
-                    className="mb-2 text-sm font-semibold text-gray-700"
-                  >
-                    {(() => {
-                      switch (key) {
-                        case "vendorCompanyName":
-                          return "Vendor Company Name";
-                        case "contactNo":
-                          return "Contact Number";
-                        case "alternateMobileNo":
-                          return "Alternate Mobile Number";
-                        case "city":
-                          return "City";
-                        case "vendorEmail":
-                          return "Vendor Email";
-                        case "bankName":
-                          return "Bank Name";
-                        case "bankAccountNo":
-                          return "Bank Account Number";
-                        case "ifscCode":
-                          return "IFSC Code";
-                        case "aadharNo":
-                          return "Aadhar Number";
-                        case "panNo":
-                          return "PAN Number";
-                        case "udyogAadharNo":
-                          return "Udyog Aadhar Number";
-                        case "govtApprovalCertificate":
-                          return "Government Approval Certificate";
-                        case "vendorDocs":
-                          return "Vendor Documents";
-                        case "vendorImage":
-                          return "Vendor Image";
-                        case "aadharPhoto":
-                          return "Aadhar Photo";
-                        case "panPhoto":
-                          return "PAN Photo";
-                        case "vendorOtherDetails":
-                          return "Other Details";
-                        default:
-                          return key;
-                      }
-                    })()}
-                  </label>
-                  {key.includes("Photo") ||
-                  key.includes("Image") ||
-                  key.includes("Docs") ||
-                  key.includes("Certificate") ? (
-                    <input
-                      id={key}
-                      name={key}
-                      type="file"
-                      className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
-                      onChange={handleFileChange}
-                    />
-                  ) : (
-                    <input
-                      id={key}
-                      name={key}
-                      type="text"
-                      placeholder={examplePlaceholders[key]}
-                      className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
-                      value={vendor[key]}
-                      onChange={handleChange}
-                      onKeyDown={handleKeyDown}
-                    />
-                  )}
+          {successMsg ? (
+            <div className="text-center text-green-600 font-bold text-xl">
+              {successMsg}
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {Object.keys(vendor).map((key) => (
+                  <div key={key} className="flex flex-col">
+                    <label
+                      htmlFor={key}
+                      className="mb-2 text-sm font-semibold text-gray-700"
+                    >
+                      {(() => {
+                        switch (key) {
+                          case "vendorCompanyName":
+                            return "Vendor Company Name";
+                          case "contactNo":
+                            return "Contact Number";
+                          case "alternateMobileNo":
+                            return "Alternate Mobile Number";
+                          case "city":
+                            return "City";
+                          case "vendorEmail":
+                            return "Vendor Email";
+                          case "bankName":
+                            return "Bank Name";
+                          case "bankAccountNo":
+                            return "Bank Account Number";
+                          case "ifscCode":
+                            return "IFSC Code";
+                          case "aadharNo":
+                            return "Aadhar Number";
+                          case "panNo":
+                            return "PAN Number";
+                          case "udyogAadharNo":
+                            return "Udyog Aadhar Number";
+                          case "govtApprovalCertificate":
+                            return "Government Approval Certificate";
+                          case "vendorDocs":
+                            return "Vendor Documents";
+                          case "vendorImage":
+                            return "Vendor Image";
+                          case "aadharPhoto":
+                            return "Aadhar Photo";
+                          case "panPhoto":
+                            return "PAN Photo";
+                          case "vendorOtherDetails":
+                            return "Other Details";
+                          default:
+                            return key;
+                        }
+                      })()}
+                    </label>
+                    {key.includes("Photo") ||
+                    key.includes("Image") ||
+                    key.includes("Docs") ||
+                    key.includes("Certificate") ? (
+                      <input
+                        id={key}
+                        name={key}
+                        type="file"
+                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        onChange={handleFileChange}
+                        disabled={formDisabled}
+                      />
+                    ) : (
+                      <input
+                        id={key}
+                        name={key}
+                        type="text"
+                        placeholder={examplePlaceholders[key]}
+                        className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        value={vendor[key]}
+                        onChange={handleChange}
+                        onKeyDown={handleKeyDown}
+                        disabled={formDisabled}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+              {errorMsg && (
+                <div className="text-center text-red-500 font-medium">
+                  {errorMsg}
                 </div>
-              ))}
-            </div>
-            {errorMsg && (
-              <div className="text-center text-red-500 font-medium">{errorMsg}</div>
-            )}
-            <div className="text-center">
-              <button
-                type="submit"
-                className="mt-4 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 transition duration-300 text-white font-semibold px-8 py-3 rounded-full shadow-lg"
-              >
-                Submit Registration
-              </button>
-            </div>
-          </form>
+              )}
+              <div className="text-center">
+                <button
+                  type="submit"
+                  className="mt-4 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 transition duration-300 text-white font-semibold px-8 py-3 rounded-full shadow-lg"
+                  disabled={formDisabled}
+                >
+                  Submit Registration
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
     </div>

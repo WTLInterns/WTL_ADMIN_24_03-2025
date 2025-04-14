@@ -13,7 +13,7 @@ const VendorDetails = ({ params }) => {
     const fetchVendorDetails = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:8080/vendors/${id}`);
+        const response = await fetch(`https://api.worldtriplink.com/vendors/${id}`);
         const data = await response.json();
         setVendor(data);
       } catch (error) {
@@ -100,27 +100,27 @@ const VendorDetails = ({ params }) => {
           {/* Right Box: Vendor Image & Documents */}
           <div className="w-1/2 flex flex-col items-center">
             <img
-              src={`http://localhost:8080${vendor?.vendorImage}`}
+              src={`https://api.worldtriplink.com${vendor?.vendorImage}`}
               alt="Vendor"
               className="w-40 h-40 object-cover rounded-lg shadow-md"
             />
             <div className="mt-6 space-y-4 w-full">
               <a
-                href={`http://localhost:8080${vendor?.panPhoto}`}
+                href={`https://api.worldtriplink.com${vendor?.panPhoto}`}
                 target="_blank"
                 className="block w-full bg-green-600 text-white text-center py-2 rounded-lg shadow-md hover:bg-green-700 transition-all"
               >
                 View PAN
               </a>
               <a
-                href={`http://localhost:8080${vendor?.aadharPhoto}`}
+                href={`https://api.worldtriplink.com${vendor?.aadharPhoto}`}
                 target="_blank"
                 className="block w-full bg-blue-600 text-white text-center py-2 rounded-lg shadow-md hover:bg-blue-700 transition-all"
               >
                 View Aadhar
               </a>
               <a
-                href={`http://localhost:8080${vendor?.govtApprovalCertificate}`}
+                href={`https://api.worldtriplink.com${vendor?.govtApprovalCertificate}`}
                 target="_blank"
                 className="block w-full bg-purple-600 text-white text-center py-2 rounded-lg shadow-md hover:bg-purple-700 transition-all"
               >
@@ -151,7 +151,7 @@ export default VendorDetails;
 //     const fetchVendorDetails = async () => {
 //       setLoading(true);
 //       try {
-//         const response = await fetch(`http://localhost:8080/vendors/${id}`); // Replace with actual API endpoint
+//         const response = await fetch(`https://api.worldtriplink.com/vendors/${id}`); // Replace with actual API endpoint
 //         const data = await response.json();
 //         setVendor(data);
 //       } catch (error) {

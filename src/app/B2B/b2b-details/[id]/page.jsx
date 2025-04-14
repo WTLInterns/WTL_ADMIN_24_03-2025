@@ -15,21 +15,21 @@ export default function B2BDetailsPage() {
   const [imageSrc, setImageSrc] = useState(null);
 
   // Helper: Build full image URL if not already absolute.
-  // If the path starts with "/uploads/", it prepends "http://localhost:8080"
+  // If the path starts with "/uploads/", it prepends "https://api.worldtriplink.com"
   const buildImageUrl = (path) => {
     if (!path) return null;
     if (path.startsWith("http")) return path;
     if (path.startsWith("/uploads/")) {
-      return "http://localhost:8080" + path;
+      return "https://api.worldtriplink.com" + path;
     }
-    return "http://localhost:8080/uploads/" + path;
+    return "https://api.worldtriplink.com/uploads/" + path;
   };
 
   // Fetch the B2B record by ID from the backend
   useEffect(() => {
     async function fetchB2B() {
       try {
-        const response = await fetch(`http://localhost:8080/b2b/${params.id}`);
+        const response = await fetch(`https://api.worldtriplink.com/b2b/${params.id}`);
         if (!response.ok) {
           throw new Error("B2B not found");
         }
