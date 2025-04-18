@@ -24,7 +24,7 @@ const ArrowPage = () => {
 
   useEffect(() => {
     // Fetching data from the backend
-    fetch(`http://localhost:8080/cabAdmin/${params.id}`) // Make sure this URL matches your backend API
+    fetch(`https://api.worldtriplink.com/cabAdmin/${params.id}`) // Make sure this URL matches your backend API
       .then((response) => response.json())
       .then((data) => setCab(data))
       .catch((error) => console.error("Error fetching vehicles:", error));
@@ -43,7 +43,7 @@ const ArrowPage = () => {
     // Send the PUT request to update the status
     axios
       .put(
-        `http://localhost:8080/cabAdmin/${params.id}/status`,
+        `https://api.worldtriplink.com/cabAdmin/${params.id}/status`,
         { status },
         {
           headers: {
@@ -87,7 +87,7 @@ const ArrowPage = () => {
           <div className="w-1/2 h-[500px] flex flex-col justify-center items-center">
             {cab.cabImage && (
               <img
-                src={`http://localhost:8080/images/cabAdminImg/${cab.cabImage}`} // Prepend the static URL
+                src={`https://api.worldtriplink.com/images/cabAdminImg/${cab.cabImage}`} // Prepend the static URL
                 alt="Car"
                 className="w-full h-full object-cover"
               />
@@ -106,7 +106,7 @@ const ArrowPage = () => {
               <div className="flex flex-col items-center">
                 {cab.frontImage && (
                   <img
-                    src={`http://localhost:8080/images/cabAdminImg/${cab.frontImage}`} // Prepend the static URL
+                    src={`https://api.worldtriplink.com/images/cabAdminImg/${cab.frontImage}`} // Prepend the static URL
                     alt="Car"
                     className="w-16 h-16 object-cover"
                   />
@@ -117,7 +117,7 @@ const ArrowPage = () => {
               <div className="flex flex-col items-center">
                 {cab.sideImage && (
                   <img
-                    src={`http://localhost:8080/images/cabAdminImg/${cab.backImage}`} // Prepend the static URL
+                    src={`https://api.worldtriplink.com/images/cabAdminImg/${cab.backImage}`} // Prepend the static URL
                     alt="Car"
                     className="w-16 h-16 object-cover"
                   />
@@ -128,7 +128,7 @@ const ArrowPage = () => {
               <div className="flex flex-col items-center">
                 {cab.cabImage && (
                   <img
-                    src={`http://localhost:8080/images/cabAdminImg/${cab.sideImage}`} // Prepend the static URL
+                    src={`https://api.worldtriplink.com/images/cabAdminImg/${cab.sideImage}`} // Prepend the static URL
                     alt="Car"
                     className="w-16 h-16 object-cover"
                   />
@@ -232,7 +232,7 @@ const ArrowPage = () => {
 
               {modalTitle === "Car RC Number" && (
                 <img
-                  src={`http://localhost:8080/images/cabAdminImg/${cab.cabImage}`} // Prepend the static URL
+                  src={`https://api.worldtriplink.com/images/cabAdminImg/${cab.cabImage}`} // Prepend the static URL
                   alt={modalTitle}
                   className="w-full h-full object-cover mb-5"
                 />
@@ -240,7 +240,7 @@ const ArrowPage = () => {
 
               {modalTitle === "Insurance" && (
                 <img
-                  src={`http://localhost:8080/images/cabAdminImg/${cab.insurance}`} // Prepend the static URL
+                  src={`https://api.worldtriplink.com/images/cabAdminImg/${cab.insurance}`} // Prepend the static URL
                   alt={modalTitle}
                   className="w-full h-full object-cover mb-5"
                 />
@@ -248,7 +248,7 @@ const ArrowPage = () => {
 
               {modalTitle === "Permit" && (
                 <img
-                  src={`http://localhost:8080/images/cabAdminImg/${cab.permit}`} // Prepend the static URL
+                  src={`https://api.worldtriplink.com/images/cabAdminImg/${cab.permit}`} // Prepend the static URL
                   alt={modalTitle}
                   className="w-full h-full object-cover mb-5"
                 />
@@ -256,7 +256,7 @@ const ArrowPage = () => {
 
               {modalTitle === "Fitness Certificate" && (
                 <img
-                  src={`http://localhost:8080/images/cabAdminImg/${cab.fitnessCert}`} // Prepend the static URL
+                  src={`https://api.worldtriplink.com/images/cabAdminImg/${cab.fitnessCert}`} // Prepend the static URL
                   alt={modalTitle}
                   className="w-full h-full object-cover mb-5"
                 />

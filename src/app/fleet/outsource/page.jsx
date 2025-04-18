@@ -16,7 +16,7 @@ const Page = () => {
   // Fetch outsource vehicles from the backend
   const fetchSource = async () => {
     try {
-      const response = await fetch("http://localhost:8080/vehicle/all");
+      const response = await fetch("https://api.worldtriplink.com/vehicle/all");
       const data = await response.json();
       setSource(data);
     } catch (error) {
@@ -158,7 +158,7 @@ const Page = () => {
                         <td className="border px-4 py-2">
                           {vehicle.carImage && (
                             <img
-                              src={`http://localhost:8080/images/outSourceImg/${vehicle.carImage}`}
+                              src={`https://api.worldtriplink.com/images/outSourceImg/${vehicle.carImage}`}
                               alt="Car"
                               className="w-16 h-16 object-cover"
                             />

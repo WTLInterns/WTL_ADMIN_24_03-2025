@@ -20,7 +20,7 @@ export default function Login() {
 
     try {
       // Make POST request to login API
-      const response = await axios.post("http://localhost:8080/wtlLogin", {
+      const response = await axios.post("https://api.worldtriplink.com/wtlLogin", {
         username,
         password,
       });
