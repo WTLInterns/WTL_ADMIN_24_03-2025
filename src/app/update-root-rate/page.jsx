@@ -114,7 +114,7 @@ const UpdateTripPricing = ({ params }) => {
     const destinationState = dropParts[1] || "";
 
     try {
-      const getUrl = `https://api.worldtriplink.com/oneWay2/${encodeURIComponent(pickup)}/${encodeURIComponent(drop)}`;
+      const getUrl = `http://localhost:8080/oneWay2/${encodeURIComponent(pickup)}/${encodeURIComponent(drop)}`;
       const getResponse = await fetch(getUrl);
       let existingTrips = [];
       if (getResponse.ok) {
@@ -127,10 +127,10 @@ const UpdateTripPricing = ({ params }) => {
       let method;
 
       if (!existingTrips || existingTrips.length === 0) {
-        apiUrl = "https://api.worldtriplink.com/oneprice";
+        apiUrl = "http://localhost:8080/oneprice";
         method = "POST";
       } else {
-        apiUrl = "https://api.worldtriplink.com/update-prices";
+        apiUrl = "http://localhost:8080/update-prices";
         method = "PUT";
       }
 
@@ -196,7 +196,7 @@ const UpdateTripPricing = ({ params }) => {
     formData.append("endDate", endDate);
 
     try {
-      const response = await fetch("https://api.worldtriplink.com/upload/excel", {
+      const response = await fetch("http://localhost:8080/upload/excel", {
         method: "POST",
         body: formData,
       });
@@ -223,7 +223,7 @@ const UpdateTripPricing = ({ params }) => {
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get("https://api.worldtriplink.com/upload/excel/jobs");
+      const res = await axios.get("http://localhost:8080/upload/excel/jobs");
       setJobs(res.data);
     } catch (err) {
       console.error("Error fetching jobs:", err);
@@ -232,7 +232,7 @@ const UpdateTripPricing = ({ params }) => {
 
   const deleteJob = async () => {
     try {
-      const res = await axios.delete("https://api.worldtriplink.com/upload/excel/delete");
+      const res = await axios.delete("http://localhost:8080/upload/excel/delete");
       alert(res.data);
       fetchJobs();
     } catch (err) {
@@ -254,7 +254,7 @@ const UpdateTripPricing = ({ params }) => {
     formData.append("endDate", endDate);
 
     try {
-      const res = await axios.post("https://api.worldtriplink.com/upload/excel", formData);
+      const res = await axios.post("http://localhost:8080/upload/excel", formData);
       alert(res.data);
       fetchJobs();
     } catch (err) {
@@ -268,7 +268,19 @@ const UpdateTripPricing = ({ params }) => {
     <div className="flex">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-8">One Way Trip Prices Outstation</h1>
+        <div className="flex justify-between items-center mb-8">
+    <h1 className="text-4xl font-bold">One Way Trip Prices Outstation</h1>
+    <button 
+      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      onClick={() => {
+        // Add your export functionality logic here, such as navigating to the export endpoint.
+        window.location.href = "http://localhost:8080/upload/excel/export";
+      }}
+    >
+      Export Prices
+    </button>
+  </div>
+        {/* <h1 className="text-4xl font-bold text-center mb-8">One Way Trip Prices Outstation</h1> */}
         <div className="card bg-white shadow-md rounded-md mb-6">
           <div className="card-header bg-gray-200 px-4 py-2 rounded-t-md">
             <strong className="text-lg font-semibold flex items-center">

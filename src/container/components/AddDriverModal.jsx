@@ -67,7 +67,7 @@ const AddDriverModal = ({ isOpen, onClose,        onSuccess}) => {
 
     try {
       const response = await axios.post(
-        "https://api.worldtriplink.com/driverAdmin/save",
+        "http://localhost:8080/driverAdmin/save",
         data,
         {
           headers: {

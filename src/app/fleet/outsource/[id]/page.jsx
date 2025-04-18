@@ -17,7 +17,7 @@ const ArrowPage = () => {
   console.log(params.id);
 
   useEffect(() => {
-    fetch(`https://api.worldtriplink.com/vehicle/${params.id}`)
+    fetch(`http://localhost:8080/vehicle/${params.id}`)
       .then((response) => response.json())
       .then((data) => setCab(data))
       .catch((error) => console.error("Error fetching vehicles:", error));
@@ -35,7 +35,7 @@ const ArrowPage = () => {
 
     axios
       .put(
-        `https://api.worldtriplink.com/vehicle/${params.id}/status`,
+        `http://localhost:8080/vehicle/${params.id}/status`,
         { status },
         {
           headers: {
@@ -72,7 +72,7 @@ const ArrowPage = () => {
           <div className="w-1/2 h-[500px] flex flex-col justify-center items-center">
             {cab?.carImage && (
               <img
-                src={`https://api.worldtriplink.com/images/outSourceImg/${cab.carImage}`}
+                src={`http://localhost:8080/images/outSourceImg/${cab.carImage}`}
                 alt="Car"
                 className="w-full h-full object-cover"
               />
@@ -87,7 +87,7 @@ const ArrowPage = () => {
               <div className="flex flex-col items-center">
                 {cab?.frontImage && (
                   <img
-                    src={`https://api.worldtriplink.com/images/outSourceImg/${cab.frontImage}`}
+                    src={`http://localhost:8080/images/outSourceImg/${cab.frontImage}`}
                     alt="Front"
                     className="w-16 h-16 object-cover"
                   />
@@ -97,7 +97,7 @@ const ArrowPage = () => {
               <div className="flex flex-col items-center">
                 {cab?.backImage && (
                   <img
-                    src={`https://api.worldtriplink.com/images/outSourceImg/${cab.backImage}`}
+                    src={`http://localhost:8080/images/outSourceImg/${cab.backImage}`}
                     alt="Back"
                     className="w-16 h-16 object-cover"
                   />
@@ -107,7 +107,7 @@ const ArrowPage = () => {
               <div className="flex flex-col items-center">
                 {cab?.sideImage && (
                   <img
-                    src={`https://api.worldtriplink.com/images/outSourceImg/${cab.sideImage}`}
+                    src={`http://localhost:8080/images/outSourceImg/${cab.sideImage}`}
                     alt="Side"
                     className="w-16 h-16 object-cover"
                   />
@@ -177,28 +177,28 @@ const ArrowPage = () => {
               </h2>
               {modalTitle === "Car RC Number" && cab?.rcImage && (
                 <img
-                  src={`https://api.worldtriplink.com/images/outSourceImg/${cab.rcImage}`}
+                  src={`http://localhost:8080/images/outSourceImg/${cab.rcImage}`}
                   alt="Car RC Number"
                   className="w-full h-full object-cover mb-5"
                 />
               )}
               {modalTitle === "Insurance" && cab?.insurance && (
                 <img
-                  src={`https://api.worldtriplink.com/images/outSourceImg/${cab.insurance}`}
+                  src={`http://localhost:8080/images/outSourceImg/${cab.insurance}`}
                   alt="Insurance"
                   className="w-full h-full object-cover mb-5"
                 />
               )}
               {modalTitle === "Permit" && cab?.permit && (
                 <img
-                  src={`https://api.worldtriplink.com/images/outSourceImg/${cab.permit}`}
+                  src={`http://localhost:8080/images/outSourceImg/${cab.permit}`}
                   alt="Permit"
                   className="w-full h-full object-cover mb-5"
                 />
               )}
               {modalTitle === "Fitness Certificate" && cab?.fitnessCert && (
                 <img
-                  src={`https://api.worldtriplink.com/images/outSourceImg/${cab.fitnessCert}`}
+                  src={`http://localhost:8080/images/outSourceImg/${cab.fitnessCert}`}
                   alt="Fitness Certificate"
                   className="w-full h-full object-cover mb-5"
                 />
