@@ -116,12 +116,10 @@ const UpdateTripPricing = ({ params }) => {
     const destinationCity = dropParts[0] || "";
     const destinationState = dropParts[1] || "";
 
-    https://api.worldtriplink.com
-
-    https://api.worldtriplink.com
+  
     try {
       // Call the GET API for round-trip to check for existing data.
-      const getUrl = `https://api.worldtriplink.com/roundTrip/${encodeURIComponent(pickup)}/${encodeURIComponent(drop)}`;
+      const getUrl = `http://localhost:8080/roundTrip/${encodeURIComponent(pickup)}/${encodeURIComponent(drop)}`;
       const getResponse = await fetch(getUrl);
       let existingTrips = [];
       if (getResponse.ok) {
@@ -135,11 +133,11 @@ const UpdateTripPricing = ({ params }) => {
 
       if (!existingTrips || existingTrips.length === 0) {
         // No record found; use POST API for creating a new round trip pricing record.
-        apiUrl = "https://api.worldtriplink.com/rounprice";
+        apiUrl = "http://localhost:8080/rounprice";
         method = "POST";
       } else {
         // Record exists; call the PUT API to update pricing.
-        apiUrl = "https://api.worldtriplink.com/update-roundway-prices";
+        apiUrl = "http://localhost:8080/update-roundway-prices";
         method = "PUT";
       }
 
@@ -196,7 +194,7 @@ const UpdateTripPricing = ({ params }) => {
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get("https://api.worldtriplink.com/upload/roundTrip/excel/jobs");
+      const res = await axios.get("http://localhost:8080/upload/roundTrip/excel/jobs");
       setJobs(res.data);
     } catch (err) {
       console.error("Error fetching jobs:", err);
@@ -205,7 +203,7 @@ const UpdateTripPricing = ({ params }) => {
 
   const deleteJob = async () => {
     try {
-      const res = await axios.delete("https://api.worldtriplink.com/upload/roundTrip/excel/delete");
+      const res = await axios.delete("http://localhost:8080/upload/roundTrip/excel/delete");
       alert(res.data);
       fetchJobs();
     } catch (err) {
@@ -227,7 +225,7 @@ const UpdateTripPricing = ({ params }) => {
     formData.append("endDate", endDate);
 
     try {
-      const res = await axios.post("https://api.worldtriplink.com/upload/roundTrip/excel", formData);
+      const res = await axios.post("http://localhost:8080/upload/roundTrip/excel", formData);
       alert(res.data);
       fetchJobs();
     } catch (err) {
@@ -247,7 +245,7 @@ const UpdateTripPricing = ({ params }) => {
       : "One Way Trip Prices Outstation"}
   </h1>
   <a
-    href="https://api.worldtriplink.com/upload/excel/exportRound"
+    href="http://localhost:8080/upload/excel/exportRound"
     className="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition"
   >
     ExportRoundPrice
