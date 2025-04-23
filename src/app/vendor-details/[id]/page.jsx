@@ -20,7 +20,7 @@ const VendorDetails = ({ params }) => {
     const fetchVendorDetails = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:8080/vendors/${id}`);
+        const response = await fetch(`https://api.worldtriplink.com/vendors/${id}`);
         const data = await response.json();
         setVendor(data);
         setFormData(data);
@@ -57,7 +57,7 @@ const VendorDetails = ({ params }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/vendors/update-fields/vendor/${id}`,
+        `https://api.worldtriplink.com/vendors/update-fields/vendor/${id}`,
         {
           method: "PUT",
           body: form,
@@ -83,7 +83,7 @@ const VendorDetails = ({ params }) => {
       }
     } catch (error) {
       console.error("Error updating vendor:", error);
-      alert("Error updating vendor.");
+      alert("Error updating vendor");
     }
   };
 
@@ -145,27 +145,27 @@ const VendorDetails = ({ params }) => {
           {/* Right: Vendor Documents */}
           <div className="w-1/2 space-y-6">
             <img
-              src={`http://localhost:8080${vendor?.vendorImage}`}
+              src={`https://api.worldtriplink.com${vendor?.vendorImage}`}
               alt="Vendor"
               className="w-40 h-40 rounded-lg object-cover mx-auto border shadow-md"
             />
             <div className="space-y-2">
               <a
-                href={`http://localhost:8080${vendor?.panPhoto}`}
+                href={`https://api.worldtriplink.com${vendor?.panPhoto}`}
                 target="_blank"
                 className="block bg-blue-500 hover:bg-blue-600 text-white text-center py-2 rounded"
               >
                 View PAN Card
               </a>
               <a
-                href={`http://localhost:8080${vendor?.aadharPhoto}`}
+                href={`https://api.worldtriplink.com${vendor?.aadharPhoto}`}
                 target="_blank"
                 className="block bg-green-500 hover:bg-green-600 text-white text-center py-2 rounded"
               >
                 View Aadhar
               </a>
               <a
-                href={`http://localhost:8080${vendor?.govtApprovalCertificate}`}
+                href={`https://api.worldtriplink.com${vendor?.govtApprovalCertificate}`}
                 target="_blank"
                 className="block bg-purple-500 hover:bg-purple-600 text-white text-center py-2 rounded"
               >
@@ -230,7 +230,7 @@ const VendorDetails = ({ params }) => {
                         previewImages[name]
                           ? previewImages[name]
                           : vendor && vendor[name]
-                          ? `http://localhost:8080${vendor[name]}`
+                          ? `https://api.worldtriplink.com${vendor[name]}`
                           : ""
                       }
                       alt={label}

@@ -50,7 +50,7 @@ const Bookings = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8080/customBooking/b", {
+      const response = await fetch("https://api.worldtriplink.com/customBooking/b", {
         method: "POST",
         headers: {
           "Content-Type": "application/json", // Ensure no charset=UTF-8
@@ -75,7 +75,7 @@ const Bookings = () => {
   // Fetch bookings from the backend
   const fetchBookings = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/details");
+      const response = await axios.get("https://api.worldtriplink.com/details");
       if (response.status === 200 && Array.isArray(response.data)) {
         setBookings(response.data);
       } else {
@@ -110,7 +110,7 @@ const Bookings = () => {
     // setSuccessMessage(null);
 
     try {
-      await axios.delete(`http://localhost:8080/delete/${bookingId}`);
+      await axios.delete(`https://api.worldtriplink.com/delete/${bookingId}`);
       setBookings((prevBookings) =>
         prevBookings.filter((booking) => booking.bookingId !== bookingId)
       );

@@ -64,7 +64,7 @@ const Page = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/cabAdmin/save",
+        "https://api.worldtriplink.com/cabAdmin/save",
         data,
         {
           headers: {
@@ -89,7 +89,7 @@ const Page = () => {
 
   const fetchCabs = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/cabAdmin/all");
+      const response = await axios.get("https://api.worldtriplink.com/cabAdmin/all");
       setCab(response.data);
       setFilteredCab(response.data); // Initialize filteredCab with all cabs
     } catch (error) {

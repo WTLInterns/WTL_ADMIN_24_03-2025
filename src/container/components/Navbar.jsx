@@ -121,11 +121,11 @@ const Layout = ({ children=null }) => {
                 </li>
                 <li>
                   <Link
-                    href="/online/cancel-booking"
+                    href="/online/visitor"
                     className="flex items-center py-2 px-4 hover:bg-blue-100 rounded"
                   >
                     <FaTimes className="mr-2" />
-                    Cancel Booking
+                   Show Visitors
                   </Link>
                 </li>
               </ul>
